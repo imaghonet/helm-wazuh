@@ -1,0 +1,88 @@
+# Copyright (C) 2018 Wazuh Inc.
+#
+# This program is a free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public
+# License (version 2) as published by the FSF - Free Software
+# Foundation.
+
+# Wazuh worker StatefulSet: 0
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wazuh-manager
+      node-type: worker
+  serviceName: wazuh-cluster
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: wazuh-manager
+        node-type: worker
+      name: wazuh-manager-worker
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: config
+          configMap:
+            name: wazuh-manager-worker-conf
+      containers:
+        - name: wazuh-manager
+          image: "wazuh/wazuh:3.13.2_7.9.1"
+          resources:
+            requests:
+              cpu: 2
+              memory: 1024Mi
+            limits:
+              cpu: 2
+              memory: 2048Mi
+          volumeMounts:
+            - name: config
+              mountPath: /wazuh-config-mount/etc/ossec.conf
+              subPath: ossec.conf
+              readOnly: true
+            - name: wazuh-manager-worker
+              mountPath: /var/ossec/data
+          ports:
+            - containerPort: 1514
+              name: agents-events
+            - containerPort: 1516
+              name: cluster
+          env:
+            - name: API_USER
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-api-cred
+                  key: username
+            - name: API_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-api-cred
+                  key: password
+            - name: WAZUH_CLUSTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wazuh-cluster-key
+                  key: key
+  volumeClaimTemplates:
+    - metadata:
+        name: wazuh-manager-worker
+        namespace: wazuh
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: gp2-encrypted-retained
+        resources:
+          requests:
+            storage: 10Gi
