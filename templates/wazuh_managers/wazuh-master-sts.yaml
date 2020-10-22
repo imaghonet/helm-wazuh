@@ -85,7 +85,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-        storageClassName: gp2-encrypted-retained
+        storageClassName: microk8s-hostpath
         resources:
           requests:
             storage: 50Gi
