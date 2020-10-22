@@ -11,7 +11,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: kibana
-  namespace: wazuh
+  namespace: {{ .Release.Namespace }}
   labels:
     app: wazuh-kibana
 spec:

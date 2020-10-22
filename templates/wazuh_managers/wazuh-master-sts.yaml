@@ -11,7 +11,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: wazuh-manager-master
-  namespace: wazuh
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
@@ -81,7 +81,7 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: wazuh-manager-master
-        namespace: wazuh
+        namespace: {{ .Release.Namespace }}
       spec:
         accessModes:
           - ReadWriteOnce

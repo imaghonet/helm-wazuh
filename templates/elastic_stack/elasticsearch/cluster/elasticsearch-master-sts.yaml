@@ -11,7 +11,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: wazuh-elasticsearch
-  namespace: wazuh
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 3
   selector:
@@ -94,7 +94,7 @@ spec:
   volumeClaimTemplates:
     - metadata:
         name: wazuh-elasticsearch
-        namespace: es-cluster
+        namespace: {{ .Release.Namespace }}
       spec:
         accessModes:
           - ReadWriteOnce
