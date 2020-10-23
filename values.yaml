@@ -1,0 +1,20 @@
+
+wazuh-elasticsearch:
+  cluster:
+    enabled: true
+    data-sts:
+      image: wazuh/wazuh-elasticsearch:3.13.2_7.9.1
+    master-sts:
+      image: wazuh/wazuh-elasticsearch:3.13.2_7.9.1 
+  single-node:
+    enabled: true
+    sts:
+      image: wazuh/wazuh-elasticsearch:3.13.2_7.9.1
+wazuh-managers:
+  master-sts:
+    image: wazuh/wazuh:3.13.2_7.9.1
+wazuh-kibana:
+  image: wazuh/wazuh-kibana:3.13.2_7.9.1
+  nginx:
+    image: wazuh/wazuh-nginx:3.13.2_7.9.1
+  

@@ -52,7 +52,7 @@ spec:
             privileged: true
       containers:
         - name: {{ template "app.name" . }}-elasticsearch
-          image: 'wazuh/wazuh-elasticsearch:3.13.2_7.9.1'
+          image: '{{ index .Values.cluster "data-sts" "image" }}'
           resources:
             requests:
               cpu: 500m

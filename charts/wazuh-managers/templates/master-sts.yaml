@@ -36,7 +36,7 @@ spec:
             secretName: {{ template "app.name" . }}-authd-pass
       containers:
         - name: {{ template "app.name" . }}-manager
-          image: 'wazuh/wazuh:3.13.2_7.9.1'
+          image: '{{ index .Values "master-sts" "image" }}'
           resources:
             requests:
               cpu: 2

@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: {{ template "app.name" . }}-kibana
-          image: 'wazuh/wazuh-kibana:3.13.2_7.9.1'
+          image: '{{ .Values.image }}'
           resources:
             requests:
               cpu: 200m
