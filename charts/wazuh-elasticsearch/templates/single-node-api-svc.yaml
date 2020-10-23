@@ -13,10 +13,10 @@ metadata:
   name: elasticsearch
   namespace: {{ .Release.Namespace }}
   labels:
-    app: wazuh-elasticsearch
+    app: {{ template "app.name" . }}-elasticsearch
 spec:
   selector:
-    app: wazuh-elasticsearch
+    app: {{ template "app.name" . }}-elasticsearch
   ports:
     - name: es-rest
       port: 9200

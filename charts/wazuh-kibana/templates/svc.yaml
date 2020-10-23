@@ -13,10 +13,10 @@ metadata:
   name: kibana
   namespace: {{ .Release.Namespace }}
   labels:
-    app: wazuh-kibana
+    app: {{ template "app.name" . }}-kibana
 spec:
   selector:
-    app: wazuh-kibana
+    app: {{ template "app.name" . }}-kibana
   ports:
     - name: kibana
       port: 5601

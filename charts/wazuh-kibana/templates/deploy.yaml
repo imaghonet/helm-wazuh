@@ -10,21 +10,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wazuh-kibana
+  name: {{ template "app.name" . }}-kibana
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wazuh-kibana
+      app: {{ template "app.name" . }}-kibana
   template:
     metadata:
       labels:
-        app: wazuh-kibana
-      name: wazuh-kibana
+        app: {{ template "app.name" . }}-kibana
+      name: {{ template "app.name" . }}-kibana
     spec:
       containers:
-        - name: wazuh-kibana
+        - name: {{ template "app.name" . }}-kibana
           image: 'wazuh/wazuh-kibana:3.13.2_7.9.1'
           resources:
             requests:

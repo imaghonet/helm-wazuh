@@ -10,13 +10,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wazuh-elasticsearch
+  name: {{ template "app.name" . }}-elasticsearch
   namespace: {{ .Release.Namespace }}
   labels:
-    app: wazuh-elasticsearch
+    app: {{ template "app.name" . }}-elasticsearch
 spec:
   selector:
-    app: wazuh-elasticsearch
+    app: {{ template "app.name" . }}-elasticsearch
   ports:
     - name: es-nodes
       port: 9300

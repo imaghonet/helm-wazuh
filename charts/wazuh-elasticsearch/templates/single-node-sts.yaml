@@ -10,19 +10,19 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: wazuh-elasticsearch
+  name: {{ template "app.name" . }}-elasticsearch
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wazuh-elasticsearch
-  serviceName: wazuh-elasticsearch
+      app: {{ template "app.name" . }}-elasticsearch
+  serviceName: {{ template "app.name" . }}-elasticsearch
   template:
     metadata:
       labels:
-        app: wazuh-elasticsearch
-      name: wazuh-elasticsearch
+        app: {{ template "app.name" . }}-elasticsearch
+      name: {{ template "app.name" . }}-elasticsearch
     spec:
       # Set the wazuh-elasticsearch volume permissions so the elasticsearch user can use it!
       initContainers:
@@ -40,7 +40,7 @@ spec:
             - '-c'
             - 'chown -R 1000:1000 /usr/share/elasticsearch/data'
           volumeMounts:
-            - name: wazuh-elasticsearch
+            - name: {{ template "app.name" . }}-elasticsearch
               mountPath: /usr/share/elasticsearch/data
         - name: increase-the-vm-max-map-count
           image: busybox
@@ -51,7 +51,7 @@ spec:
           securityContext:
             privileged: true
       containers:
-        - name: wazuh-elasticsearch
+        - name: {{ template "app.name" . }}-elasticsearch
           image: 'wazuh/wazuh-elasticsearch:3.13.2_7.9.1'
           resources:
             requests:
@@ -72,7 +72,7 @@ spec:
             - name: node.name
               value: node-1
           volumeMounts:
-            - name: wazuh-elasticsearch
+            - name: {{ template "app.name" . }}-elasticsearch
               mountPath: /usr/share/elasticsearch/data
           ports:
             - containerPort: 9200
@@ -81,7 +81,7 @@ spec:
               name: es-nodes
   volumeClaimTemplates:
     - metadata:
-        name: wazuh-elasticsearch
+        name: {{ template "app.name" . }}-elasticsearch
         namespace: {{ .Release.Namespace }}
       spec:
         accessModes:

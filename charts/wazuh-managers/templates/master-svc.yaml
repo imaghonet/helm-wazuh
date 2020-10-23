@@ -10,10 +10,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: wazuh  # Don't change, unless you update the Wazuh Kibana app config
+  name: {{ template "app.name" . }}  # Don't change, unless you update the Wazuh Kibana app config
   namespace: {{ .Release.Namespace }}
   labels:
-    app: wazuh-manager
+    app: {{ template "app.name" . }}-manager
     # dns: route53
   annotations:
     # domainName: 'changeme'
@@ -21,7 +21,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: wazuh-manager
+    app: {{ template "app.name" . }}-manager
     node-type: master
   ports:
     - name: registration

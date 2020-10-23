@@ -10,32 +10,32 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: wazuh-manager-master
+  name: {{ template "app.name" . }}-manager-master
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: wazuh-manager
+      app: {{ template "app.name" . }}-manager
       node-type: master
-  serviceName: wazuh-cluster
+  serviceName: {{ template "app.name" . }}-cluster
   podManagementPolicy: Parallel
   template:
     metadata:
       labels:
-        app: wazuh-manager
+        app: {{ template "app.name" . }}-manager
         node-type: master
-      name: wazuh-manager-master
+      name: {{ template "app.name" . }}-manager-master
     spec:
       volumes:
         - name: config
           configMap:
-            name: wazuh-manager-master-conf
-        - name: wazuh-authd-pass
+            name: {{ template "app.name" . }}-manager-master-conf
+        - name: {{ template "app.name" . }}-authd-pass
           secret:
-            secretName: wazuh-authd-pass
+            secretName: {{ template "app.name" . }}-authd-pass
       containers:
-        - name: wazuh-manager
+        - name: {{ template "app.name" . }}-manager
           image: 'wazuh/wazuh:3.13.2_7.9.1'
           resources:
             requests:
@@ -49,9 +49,9 @@ spec:
               mountPath: /wazuh-config-mount/etc/ossec.conf
               subPath: ossec.conf
               readOnly: true
-            - name: wazuh-manager-master
+            - name: {{ template "app.name" . }}-manager-master
               mountPath: /var/ossec/data
-            - name: wazuh-authd-pass
+            - name: {{ template "app.name" . }}-authd-pass
               mountPath: /wazuh-config-mount/etc/authd.pass
               subPath: authd.pass
               readOnly: true
@@ -66,21 +66,21 @@ spec:
             - name: API_USER
               valueFrom:
                 secretKeyRef:
-                  name: wazuh-api-cred
+                  name: {{ template "app.name" . }}-api-cred
                   key: username
             - name: API_PASS
               valueFrom:
                 secretKeyRef:
-                  name: wazuh-api-cred
+                  name: {{ template "app.name" . }}-api-cred
                   key: password
             - name: WAZUH_CLUSTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: wazuh-cluster-key
+                  name: {{ template "app.name" . }}-cluster-key
                   key: key
   volumeClaimTemplates:
     - metadata:
-        name: wazuh-manager-master
+        name: {{ template "app.name" . }}-manager-master
         namespace: {{ .Release.Namespace }}
       spec:
         accessModes:
