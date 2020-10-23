@@ -1,7 +1,7 @@
 wazuh-elasticsearch:
   image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch:3.13.2_7.9.1
   cluster:
-    enabled: true
+    enabled: false
     data-sts:
       image: *wazuh-elasticsearch-image
     master-sts:

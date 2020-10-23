@@ -7,6 +7,8 @@
 
 # Elasticsearch StatefulSet: 3 master nodes.
 
+{{- if .Values.cluster.enabled }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -102,3 +104,5 @@ spec:
         resources:
           requests:
             storage: 10Gi
+            
+{{- end }}           

@@ -7,6 +7,8 @@
 
 # Elasticsearch StatefulSet: Single node.
 
+{{- if (index .Values "single-node" "enabled") }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -90,3 +92,5 @@ spec:
         resources:
           requests:
             storage: 30Gi
+
+{{- end }}
