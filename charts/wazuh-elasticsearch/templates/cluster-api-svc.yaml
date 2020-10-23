@@ -12,7 +12,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: elasticsearch
+  name: {{ template "app.name" . }}-elasticsearch
   namespace: {{ .Release.Namespace }}
   labels:
     app: {{ template "app.name" . }}-elasticsearch
