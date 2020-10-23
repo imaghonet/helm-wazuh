@@ -36,7 +36,7 @@ spec:
             secretName: {{ template "app.name" . }}-authd-pass
       containers:
         - name: {{ template "app.name" . }}-manager
-          image: '{{ index .Values "master-sts" "image" }}'
+          image: "{{ index .Values "master-sts" "image" }}:{{ index .Values "master-sts" "version" }}"
           resources:
             requests:
               cpu: 2

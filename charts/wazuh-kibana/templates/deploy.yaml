@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: {{ template "app.name" . }}-kibana
-          image: '{{ .Values.image }}'
+          image: "{{ .Values.image }}:{{ .Values.version }}"
           resources:
             requests:
               cpu: 200m

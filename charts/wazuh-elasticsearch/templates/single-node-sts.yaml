@@ -54,7 +54,7 @@ spec:
             privileged: true
       containers:
         - name: {{ template "app.name" . }}-elasticsearch
-          image: '{{ index .Values "single-node" "sts" "image" }}'
+          image: "{{ index .Values "single-node" "sts" "image" }}:{{ index .Values "single-node" "sts" "version" }}"
           resources:
             requests:
               cpu: 500m

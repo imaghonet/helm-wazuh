@@ -39,7 +39,7 @@ spec:
             name: {{ template "app.name" . }}-manager-worker-conf
       containers:
         - name: {{ template "app.name" . }}-manager
-          image: "wazuh/wazuh:3.13.2_7.9.1"
+          image: "{{ index .Values "worker-sts" "image" }}:{{ index .Values "worker-sts" "version" }}"
           resources:
             requests:
               cpu: 2

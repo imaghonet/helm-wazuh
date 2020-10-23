@@ -1,20 +1,31 @@
+version: &version 3.13.2_7.9.1
+
 wazuh-elasticsearch:
-  image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch:3.13.2_7.9.1
+  image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
   cluster:
     enabled: false
     data-sts:
-      image: *wazuh-elasticsearch-image
+      image: wazuh/wazuh-elasticsearch
+      version: *version
     master-sts:
-      image: *wazuh-elasticsearch-image
+      image: wazuh/wazuh-elasticsearch
+      version: *version
   single-node:
     enabled: true
     sts:
-      image: *wazuh-elasticsearch-image
+      image: wazuh/wazuh-elasticsearch
+      version: *version
 wazuh-managers:
   master-sts:
-    image: wazuh/wazuh:3.13.2_7.9.1
+    image: wazuh/wazuh
+    version: *version
+  worker-sts:
+    image: wazuh/wazuh
+    version: *version
 wazuh-kibana:
-  image: wazuh/wazuh-kibana:3.13.2_7.9.1
+  image: wazuh/wazuh-kibana
+  version: *version
   nginx:
-    image: wazuh/wazuh-nginx:3.13.2_7.9.1
+    image: wazuh/wazuh-nginx
+    version: *version
   
