@@ -39,3 +39,6 @@ spec:
               value: 'http://wazuh-elasticsearch-elasticsearch:9200'
             - name: NODE_OPTIONS
               value: '--max-old-space-size=2048'
+            - name: WAZUH_API_URL  
+              value: https://wazuh-managers-wazuh
+            
