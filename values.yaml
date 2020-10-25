@@ -21,6 +21,14 @@ wazuh-elasticsearch:
       name: es-nodes
   cluster:
     enabled: false
+    elasticsearchPersistentVolumeCluster: &elasticsearchPersistentVolumeCluster
+      wazuh-elasticsearch-elasticsearch:
+        mountPath: /usr/share/elasticsearch/data
+        reclaimPolicy: Retain
+        capacity: 10Gi
+        storageClassName: microk8s-hostpath
+        accessModes:
+          - ReadWriteOnce
     data-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
@@ -31,7 +39,8 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
-      ports: *wazuh-elasticsearch-ports            
+      ports: *wazuh-elasticsearch-ports
+      persistentVolume: *elasticsearchPersistentVolumeCluster        
     master-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
@@ -42,13 +51,22 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
-      ports: *wazuh-elasticsearch-ports  
+      ports: *wazuh-elasticsearch-ports
+      persistentVolume: *elasticsearchPersistentVolumeCluster
     api-svc:
       ports:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port
   single-node:
+    elasticsearchPersistentVolumeSingleNode: &elasticsearchPersistentVolumeSingleNode
+      wazuh-elasticsearch-elasticsearch:
+        mountPath: /usr/share/elasticsearch/data
+        reclaimPolicy: Retain
+        capacity: 30Gi
+        storageClassName: microk8s-hostpath
+        accessModes:
+          - ReadWriteOnce
     enabled: true
     sts:
       image: wazuh/wazuh-elasticsearch
@@ -60,7 +78,8 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
-      ports: *wazuh-elasticsearch-ports    
+      ports: *wazuh-elasticsearch-ports   
+      persistentVolume: *elasticsearchPersistentVolumeSingleNode
 wazuh-managers:
   volume-mount-hack: *volume-mount-hack
   master-sts:
@@ -79,7 +98,15 @@ wazuh-managers:
       - containerPort: 1516
         name: cluster
       - containerPort: 55000
-        name: api    
+        name: api
+    persistentVolume:     
+      wazuh-managers-manager-master:
+          mountPath: /var/ossec/data
+          reclaimPolicy: Retain
+          capacity: 50Gi
+          storageClassName: microk8s-hostpath
+          accessModes:
+            - ReadWriteOnce  
   worker-sts:
     image: wazuh/wazuh
     version: *version
@@ -94,7 +121,15 @@ wazuh-managers:
       - containerPort: 1514
         name: agents-events
       - containerPort: 1516
-        name: cluster    
+        name: cluster 
+    persistentVolume:     
+      wazuh-managers-manager-worker:
+          mountPath: /var/ossec/data
+          reclaimPolicy: Retain
+          capacity: 10Gi
+          storageClassName: microk8s-hostpath
+          accessModes:
+            - ReadWriteOnce      
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
   image: wazuh/wazuh-kibana

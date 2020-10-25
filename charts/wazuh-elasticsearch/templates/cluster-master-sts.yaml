@@ -9,11 +9,18 @@
 
 {{- if .Values.cluster.enabled }}
 
+{{- $this := . }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "app.name" . }}-elasticsearch
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "app.name" . }}-elasticsearch
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 3
   selector:
@@ -28,6 +35,7 @@ spec:
     spec:
       # Set the wazuh-elasticsearch volume permissions so the elasticsearch user can use it!
       initContainers:
+{{- if .Values.persistentVolume }}        
         - name: volume-mount-hack
           image: busybox
           {{- with (index .Values "volume-mount-hack" "resources") }}
@@ -37,10 +45,15 @@ spec:
           command:
             - sh
             - '-c'
-            - 'chown -R 1000:1000 /usr/share/elasticsearch/data'
+            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            - 'chown -R 1000:1000 {{ $vmData.mountPath }}'
+            {{- end }}
           volumeMounts:
-            - name: {{ template "app.name" . }}-elasticsearch
-              mountPath: /usr/share/elasticsearch/data
+            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            - mountPath: {{ $vmData.mountPath }}
+              name: {{ $vmName }}
+            {{- end }} 
+{{- end }}
         - name: increase-the-vm-max-map-count
           image: busybox
           command:
@@ -79,23 +92,50 @@ spec:
               value: {{ template "app.name" . }}-elasticsearch
             - name: discovery.zen.minimum_master_nodes
               value: "2"
-          volumeMounts:
-            - name: {{ template "app.name" . }}-elasticsearch
-              mountPath: /usr/share/elasticsearch/data
-          {{- with (index .Values.cluster "master-sts" "ports") }}
+          {{- with (index .Values.cluster "master-sts" "ports") }}    
           ports:
           {{- .|toYaml|nindent 12}}
-          {{- end }}
+          {{- end }}   
+{{- if .Values.persistentVolume }}
+          volumeMounts:
+            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            - mountPath: {{ $vmData.mountPath }}
+              name: {{ $vmName }}
+            {{- end }} 
+      volumes:
+        {{- range $vmName, $vmData := .Values.persistentVolume }}
+        {{- if $vmData.existingClaim }}
+        - name: {{ $vmName }}
+          persistentVolumeClaim:
+            claimName: {{ $vmData.existingClaim }}
+        {{- end }}
+        {{- end }} 
   volumeClaimTemplates:
+    {{- range $vmName, $vmData := .Values.persistentVolume }}
+      {{- if (not $vmData.existingClaim) }}
     - metadata:
-        name: {{ template "app.name" . }}-elasticsearch
+        name: {{ $vmName }}
         namespace: {{ .Release.Namespace }}
       spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: microk8s-hostpath
+          {{- if (not $vmData.storageClassName) }}
+        selector:
+          matchLabels:
+            app: {{ template "app.name" $this }}-elasticsearch
+            release: {{ $this.Release.Name }}
+          {{- end }}
         resources:
           requests:
-            storage: 10Gi
-            
-{{- end }}           
+            storage: {{ $vmData.capacity }}
+          {{- if $vmData.storageClassName }}
+        storageClassName: {{ $vmData.storageClassName }}
+          {{- end }}
+          {{- if $vmData.accessModes }}
+        accessModes:
+          {{- range $item := $vmData.accessModes }}
+          - {{ $item }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}

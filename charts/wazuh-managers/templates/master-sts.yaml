@@ -7,11 +7,18 @@
 
 # Wazuh master StatefulSet
 
+{{- $this := . }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "app.name" . }}-manager-master
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "app.name" . }}-manager-master
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 1
   selector:
@@ -27,13 +34,6 @@ spec:
         node-type: master
       name: {{ template "app.name" . }}-manager-master
     spec:
-      volumes:
-        - name: config
-          configMap:
-            name: {{ template "app.name" . }}-manager-master-conf
-        - name: {{ template "app.name" . }}-authd-pass
-          secret:
-            secretName: {{ template "app.name" . }}-authd-pass
       containers:
         - name: {{ template "app.name" . }}-manager
           image: "{{ index .Values "master-sts" "image" }}:{{ index .Values "master-sts" "version" }}"
@@ -41,17 +41,6 @@ spec:
           resources:
           {{- .|toYaml|nindent 12}}
           {{- end }}
-          volumeMounts:
-            - name: config
-              mountPath: /wazuh-config-mount/etc/ossec.conf
-              subPath: ossec.conf
-              readOnly: true
-            - name: {{ template "app.name" . }}-manager-master
-              mountPath: /var/ossec/data
-            - name: {{ template "app.name" . }}-authd-pass
-              mountPath: /wazuh-config-mount/etc/authd.pass
-              subPath: authd.pass
-              readOnly: true
           {{- with (index .Values "master-sts" "ports") }}
           ports:
           {{- .|toYaml|nindent 12}}
@@ -72,14 +61,59 @@ spec:
                 secretKeyRef:
                   name: {{ template "app.name" . }}-cluster-key
                   key: key
+{{- if .Values.persistentVolume }} 
+          volumeMounts:
+            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            - mountPath: {{ $vmData.mountPath }}
+              name: {{ $vmName }}
+            {{- end }}
+            - name: config
+              mountPath: /wazuh-config-mount/etc/ossec.conf
+              subPath: ossec.conf
+              readOnly: true  
+            - name: {{ template "app.name" . }}-authd-pass
+              mountPath: /wazuh-config-mount/etc/authd.pass
+              subPath: authd.pass
+              readOnly: true
+      volumes:
+        {{- range $vmName, $vmData := .Values.persistentVolume }}
+        {{- if $vmData.existingClaim }}
+        - name: {{ $vmName }}
+          persistentVolumeClaim:
+            claimName: {{ $vmData.existingClaim }}
+        {{- end }}
+        {{- end }} 
+        - name: config
+          configMap:
+            name: {{ template "app.name" . }}-manager-master-conf
+        - name: {{ template "app.name" . }}-authd-pass
+          secret:
+            secretName: {{ template "app.name" . }}-authd-pass      
   volumeClaimTemplates:
+    {{- range $vmName, $vmData := .Values.persistentVolume }}
+      {{- if (not $vmData.existingClaim) }}
     - metadata:
-        name: {{ template "app.name" . }}-manager-master
+        name: {{ $vmName }}
         namespace: {{ .Release.Namespace }}
       spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: microk8s-hostpath
+          {{- if (not $vmData.storageClassName) }}
+        selector:
+          matchLabels:
+            app: {{ template "app.name" $this }}-manager-master
+            release: {{ $this.Release.Name }}
+          {{- end }}
         resources:
           requests:
-            storage: 50Gi
+            storage: {{ $vmData.capacity }}
+          {{- if $vmData.storageClassName }}
+        storageClassName: {{ $vmData.storageClassName }}
+          {{- end }}
+          {{- if $vmData.accessModes }}
+        accessModes:
+          {{- range $item := $vmData.accessModes }}
+          - {{ $item }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+    {{- end }}
+{{- end }}

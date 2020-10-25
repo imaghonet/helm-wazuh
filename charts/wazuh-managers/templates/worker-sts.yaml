@@ -7,11 +7,18 @@
 
 # Wazuh worker StatefulSet: 0
 
+{{- $this := . }}
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: {{ template "app.name" . }}-manager-worker
   namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "app.name" . }}-manager-worker
+    chart: {{ template "app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: 2
   selector:
@@ -33,10 +40,6 @@ spec:
             - weight: 100
               podAffinityTerm:
                 topologyKey: kubernetes.io/hostname
-      volumes:
-        - name: config
-          configMap:
-            name: {{ template "app.name" . }}-manager-worker-conf
       containers:
         - name: {{ template "app.name" . }}-manager
           image: "{{ index .Values "worker-sts" "image" }}:{{ index .Values "worker-sts" "version" }}"
@@ -44,17 +47,10 @@ spec:
           resources:
           {{- .|toYaml|nindent 12}}
           {{- end }}
-          volumeMounts:
-            - name: config
-              mountPath: /wazuh-config-mount/etc/ossec.conf
-              subPath: ossec.conf
-              readOnly: true
-            - name: {{ template "app.name" . }}-manager-worker
-              mountPath: /var/ossec/data
           {{- with (index .Values "worker-sts" "ports") }}
           ports:
           {{- .|toYaml|nindent 12}}
-          {{- end }}  
+          {{- end }}
           env:
             - name: API_USER
               valueFrom:
@@ -71,14 +67,52 @@ spec:
                 secretKeyRef:
                   name: {{ template "app.name" . }}-cluster-key
                   key: key
+{{- if .Values.persistentVolume }} 
+          volumeMounts:
+            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            - mountPath: {{ $vmData.mountPath }}
+              name: {{ $vmName }}
+            {{- end }} 
+            - name: config
+              mountPath: /wazuh-config-mount/etc/ossec.conf
+              subPath: ossec.conf
+              readOnly: true            
+      volumes:
+        {{- range $vmName, $vmData := .Values.persistentVolume }}
+        {{- if $vmData.existingClaim }}
+        - name: {{ $vmName }}
+          persistentVolumeClaim:
+            claimName: {{ $vmData.existingClaim }}
+        {{- end }}
+        {{- end }} 
+        - name: config
+          configMap:
+            name: {{ template "app.name" . }}-manager-worker-conf       
   volumeClaimTemplates:
+    {{- range $vmName, $vmData := .Values.persistentVolume }}
+      {{- if (not $vmData.existingClaim) }}
     - metadata:
-        name: {{ template "app.name" . }}-manager-worker
+        name: {{ $vmName }}
         namespace: {{ .Release.Namespace }}
       spec:
-        accessModes:
-          - ReadWriteOnce
-        storageClassName: microk8s-hostpath
+          {{- if (not $vmData.storageClassName) }}
+        selector:
+          matchLabels:
+            app: {{ template "app.name" $this }}-manager-worker
+            release: {{ $this.Release.Name }}
+          {{- end }}
         resources:
           requests:
-            storage: 10Gi
+            storage: {{ $vmData.capacity }}
+          {{- if $vmData.storageClassName }}
+        storageClassName: {{ $vmData.storageClassName }}
+          {{- end }}
+          {{- if $vmData.accessModes }}
+        accessModes:
+          {{- range $item := $vmData.accessModes }}
+          - {{ $item }}
+          {{- end }}
+          {{- end }}
+      {{- end }}
+    {{- end }}
+{{- end }}
