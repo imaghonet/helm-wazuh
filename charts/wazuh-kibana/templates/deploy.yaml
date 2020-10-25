@@ -36,6 +36,6 @@ spec:
           {{- end }}
           env:
             - name: ELASTICSEARCH_URL
-              value: 'http://elasticsearch:9200'
+              value: 'http://wazuh-elasticsearch-elasticsearch:9200'
             - name: NODE_OPTIONS
               value: '--max-old-space-size=2048'
