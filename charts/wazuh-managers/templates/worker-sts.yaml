@@ -40,13 +40,10 @@ spec:
       containers:
         - name: {{ template "app.name" . }}-manager
           image: "{{ index .Values "worker-sts" "image" }}:{{ index .Values "worker-sts" "version" }}"
+          {{- with (index .Values "worker-sts" "resources") }}
           resources:
-            requests:
-              cpu: 2
-              memory: 1024Mi
-            limits:
-              cpu: 2
-              memory: 2048Mi
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /wazuh-config-mount/etc/ossec.conf

@@ -30,13 +30,10 @@ spec:
       initContainers:
         - name: volume-mount-hack
           image: busybox
+          {{- with (index .Values "volume-mount-hack" "resources") }}
           resources:
-            requests:
-              cpu: 50m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 256Mi
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
           command:
             - sh
             - '-c'
@@ -55,13 +52,10 @@ spec:
       containers:
         - name: {{ template "app.name" . }}-elasticsearch
           image: "{{ index .Values "single-node" "sts" "image" }}:{{ index .Values "single-node" "sts" "version" }}"
+          {{- with (index .Values "single-node" "sts" "resources") }}
           resources:
-            requests:
-              cpu: 500m
-              memory: 1Gi
-            limits:
-              cpu: 1
-              memory: 2Gi
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
           env:
             - name: ES_JAVA_OPTS
               value: '-Xms1024m -Xmx1024m'

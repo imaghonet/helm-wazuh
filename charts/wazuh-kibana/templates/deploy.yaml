@@ -26,13 +26,10 @@ spec:
       containers:
         - name: {{ template "app.name" . }}-kibana
           image: "{{ .Values.image }}:{{ .Values.version }}"
+          {{- with .Values.resources }}
           resources:
-            requests:
-              cpu: 200m
-              memory: 512Mi
-            limits:
-              cpu: 400m
-              memory: 2048Mi
+          {{- .|toYaml|nindent 12}}
+          {{- end }} 
           ports:
             - containerPort: 5601
               name: kibana

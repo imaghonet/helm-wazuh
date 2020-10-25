@@ -1,31 +1,92 @@
 version: &version 3.13.2_7.9.1
 
+volume-mount-hack: &volume-mount-hack
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+
 wazuh-elasticsearch:
+  volume-mount-hack: *volume-mount-hack
   image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
   cluster:
     enabled: false
     data-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: 1
+          memory: 2Gi
     master-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: 1
+          memory: 2Gi
   single-node:
     enabled: true
     sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          cpu: 1
+          memory: 2Gi
 wazuh-managers:
+  volume-mount-hack: *volume-mount-hack
   master-sts:
     image: wazuh/wazuh
     version: *version
+    resources:
+      requests:
+        cpu: 2
+        memory: 1024Mi
+      limits:
+        cpu: 2
+        memory: 2048Mi
   worker-sts:
     image: wazuh/wazuh
     version: *version
+    resources:
+      requests:
+        cpu: 2
+        memory: 1024Mi
+      limits:
+        cpu: 2
+        memory: 2048Mi
 wazuh-kibana:
+  volume-mount-hack: *volume-mount-hack
   image: wazuh/wazuh-kibana
   version: *version
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 400m
+      memory: 2048Mi
   nginx:
     image: wazuh/wazuh-nginx
     version: *version
+    resources:
+      requests:
+        cpu: 100m
+        memory: 64Mi
+      limits:
+        cpu: 200m
+        memory: 128Mi
   

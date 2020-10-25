@@ -26,13 +26,10 @@ spec:
       containers:
         - name: {{ template "app.name" . }}-nginx
           image: "{{ .Values.nginx.image }}:{{ .Values.nginx.version }}"
+          {{- with .Values.nginx.resources }}
           resources:
-            requests:
-              cpu: 100m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 128Mi
+          {{- .|toYaml|nindent 12}}
+          {{- end }}          
           env:
             - name: NGINX_PORT
               value: '443'
