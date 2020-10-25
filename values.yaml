@@ -9,10 +9,13 @@ volume-mount-hack: &volume-mount-hack
       cpu: 100m
       memory: 256Mi
 
+api-port: &api-port 55000
+es-rest-port: &es-rest-port 9200
+
 wazuh-elasticsearch:
   volume-mount-hack: *volume-mount-hack
   image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
-  es-rest-port: &es-rest-port 9200
+  es-rest-port: *es-rest-port
   es-nodes-port: &es-nodes-port 9300
   ports: &wazuh-elasticsearch-ports
     - containerPort: *es-rest-port
@@ -90,7 +93,6 @@ wazuh-elasticsearch:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port  
-api-port: &api-port 55000 
 wazuh-managers: 
   volume-mount-hack: *volume-mount-hack  
   registration-port: &registration-port 1515
