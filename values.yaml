@@ -90,11 +90,12 @@ wazuh-elasticsearch:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port  
+api-port: &api-port 55000 
 wazuh-managers: 
   volume-mount-hack: *volume-mount-hack  
   registration-port: &registration-port 1515
   cluster-port: &cluster-port 1516
-  api-port: &api-port 55000  
+  api-port: *api-port
   agents-events-port: &agents-events-port 1514
   master-sts:
     image: wazuh/wazuh
@@ -167,6 +168,7 @@ wazuh-kibana:
   web-https-port: &web-https-port 443
   kibana-port: &kibana-port 5601  
   image: wazuh/wazuh-kibana
+  api-port: *api-port
   version: *version
   resources:
     requests:
