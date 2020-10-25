@@ -58,6 +58,11 @@ wazuh-elasticsearch:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port
+    svc: 
+      ports:
+      - name: es-nodes
+        port: *es-nodes-port
+        targetPort: *es-nodes-port
   single-node:
     elasticsearchPersistentVolumeSingleNode: &elasticsearchPersistentVolumeSingleNode
       wazuh-elasticsearch-elasticsearch:
@@ -80,8 +85,17 @@ wazuh-elasticsearch:
           memory: 2Gi
       ports: *wazuh-elasticsearch-ports   
       persistentVolume: *elasticsearchPersistentVolumeSingleNode
-wazuh-managers:
-  volume-mount-hack: *volume-mount-hack
+    api-svc:
+      ports:
+      - name: es-rest
+        port: *es-rest-port
+        targetPort: *es-rest-port  
+wazuh-managers: 
+  volume-mount-hack: *volume-mount-hack  
+  registration-port: &registration-port 1515
+  cluster-port: &cluster-port 1516
+  api-port: &api-port 55000  
+  agents-events-port: &agents-events-port 1514
   master-sts:
     image: wazuh/wazuh
     version: *version
@@ -93,12 +107,12 @@ wazuh-managers:
         cpu: 2
         memory: 2048Mi
     ports:
-      - containerPort: 1515
+      - containerPort: *registration-port
         name: registration
-      - containerPort: 1516
+      - containerPort: *cluster-port
         name: cluster
-      - containerPort: 55000
-        name: api
+      - containerPort: *api-port
+        name: api    
     persistentVolume:     
       wazuh-managers-manager-master:
           mountPath: /var/ossec/data
@@ -106,7 +120,7 @@ wazuh-managers:
           capacity: 50Gi
           storageClassName: microk8s-hostpath
           accessModes:
-            - ReadWriteOnce  
+            - ReadWriteOnce 
   worker-sts:
     image: wazuh/wazuh
     version: *version
@@ -118,9 +132,9 @@ wazuh-managers:
         cpu: 2
         memory: 2048Mi
     ports:
-      - containerPort: 1514
+      - containerPort: *agents-events-port
         name: agents-events
-      - containerPort: 1516
+      - containerPort: *cluster-port
         name: cluster 
     persistentVolume:     
       wazuh-managers-manager-worker:
@@ -129,9 +143,29 @@ wazuh-managers:
           capacity: 10Gi
           storageClassName: microk8s-hostpath
           accessModes:
-            - ReadWriteOnce      
+            - ReadWriteOnce
+  master-svc:
+    ports:
+    - name: registration
+      port: *registration-port
+      targetPort: *registration-port
+    - name: api
+      port: *api-port
+      targetPort: *api-port
+  cluster-svc:
+    ports:
+    - name: cluster
+      port: *cluster-port
+      targetPort: *cluster-port       
+  workers-svc:
+    ports:
+    - name: agents-events
+      port: *agents-events-port
+      targetPort: *agents-events-port   
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
+  web-https-port: &web-https-port 443
+  kibana-port: &kibana-port 5601  
   image: wazuh/wazuh-kibana
   version: *version
   resources:
@@ -142,8 +176,13 @@ wazuh-kibana:
       cpu: 400m
       memory: 2048Mi
   ports:
-    - containerPort: 5601
-      name: kibana    
+    - containerPort: *kibana-port
+      name: kibana
+  svc:
+    ports:
+    - name: kibana
+      port: *kibana-port
+      targetPort: *kibana-port
   nginx:
     image: wazuh/wazuh-nginx
     version: *version
@@ -156,5 +195,10 @@ wazuh-kibana:
         memory: 128Mi
     ports:
       - containerPort: 80
-      - containerPort: 443    
+      - containerPort: *web-https-port 
+  nginx-svc:
+    ports:
+    - name: web-https
+      port: *web-https-port
+      targetPort: *web-https-port    
   

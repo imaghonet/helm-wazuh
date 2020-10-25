@@ -17,8 +17,8 @@ metadata:
 spec:
   selector:
     app: {{ template "app.name" . }}-elasticsearch
+  {{- with (index .Values.cluster "svc" "ports") }}
   ports:
-    - name: es-nodes
-      port: 9300
-      targetPort: 9300
+  {{- .|toYaml|nindent 4}}
+  {{- end }}
   clusterIP: None

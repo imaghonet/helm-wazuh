@@ -24,7 +24,7 @@ spec:
   type: LoadBalancer
   selector:
     app: {{ template "app.name" . }}-nginx
+  {{- with (index .Values "nginx-svc" "ports") }}
   ports:
-    - name: web-https
-      port: 443
-      targetPort: 443
+  {{- .|toYaml|nindent 4}}
+  {{- end }}

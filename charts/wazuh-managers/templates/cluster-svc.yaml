@@ -17,8 +17,8 @@ metadata:
 spec:
   selector:
     app: {{ template "app.name" . }}-manager
+  {{- with (index .Values "cluster-svc" "ports") }}
   ports:
-    - name: cluster
-      port: 1516
-      targetPort: 1516
+  {{- .|toYaml|nindent 4}}
+  {{- end }}
   clusterIP: None

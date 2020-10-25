@@ -23,10 +23,7 @@ spec:
   selector:
     app: {{ template "app.name" . }}-manager
     node-type: master
+  {{- with (index .Values "master-svc" "ports") }}
   ports:
-    - name: registration
-      port: 1515
-      targetPort: 1515
-    - name: api
-      port: 55000
-      targetPort: 55000
+  {{- .|toYaml|nindent 4}}
+  {{- end }}

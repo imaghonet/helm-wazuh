@@ -17,7 +17,7 @@ metadata:
 spec:
   selector:
     app: {{ template "app.name" . }}-kibana
+  {{- with (index .Values "svc" "ports") }}
   ports:
-    - name: kibana
-      port: 5601
-      targetPort: 5601
+  {{- .|toYaml|nindent 4}}
+  {{- end }}    

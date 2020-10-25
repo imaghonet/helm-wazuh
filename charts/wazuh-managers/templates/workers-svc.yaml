@@ -23,7 +23,7 @@ spec:
   selector:
     app: {{ template "app.name" . }}-manager
     node-type: worker
+  {{- with (index .Values "workers-svc" "ports") }}
   ports:
-    - name: agents-events
-      port: 1514
-      targetPort: 1514
+  {{- .|toYaml|nindent 4}}
+  {{- end }}

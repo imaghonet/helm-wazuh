@@ -19,9 +19,8 @@ metadata:
 spec:
   selector:
     app: {{ template "app.name" . }}-elasticsearch
+  {{- with (index .Values.cluster "api-svc" "ports") }}
   ports:
-    - name: es-rest
-      port: 9200
-      targetPort: 9200
-
+  {{- .|toYaml|nindent 4}}
+  {{- end }}
 {{- end }}
