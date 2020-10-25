@@ -52,13 +52,10 @@ spec:
               mountPath: /wazuh-config-mount/etc/authd.pass
               subPath: authd.pass
               readOnly: true
+          {{- with (index .Values "master-sts" "ports") }}
           ports:
-            - containerPort: 1515
-              name: registration
-            - containerPort: 1516
-              name: cluster
-            - containerPort: 55000
-              name: api
+          {{- .|toYaml|nindent 12}}
+          {{- end }} 
           env:
             - name: API_USER
               valueFrom:

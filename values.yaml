@@ -12,6 +12,13 @@ volume-mount-hack: &volume-mount-hack
 wazuh-elasticsearch:
   volume-mount-hack: *volume-mount-hack
   image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
+  es-rest-port: &es-rest-port 9200
+  es-nodes-port: &es-nodes-port 9300
+  ports: &wazuh-elasticsearch-ports
+    - containerPort: *es-rest-port
+      name: es-rest
+    - containerPort: *es-nodes-port
+      name: es-nodes
   cluster:
     enabled: false
     data-sts:
@@ -24,6 +31,7 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
+      ports: *wazuh-elasticsearch-ports            
     master-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
@@ -34,6 +42,12 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
+      ports: *wazuh-elasticsearch-ports  
+    api-svc:
+      ports:
+      - name: es-rest
+        port: *es-rest-port
+        targetPort: *es-rest-port
   single-node:
     enabled: true
     sts:
@@ -46,6 +60,7 @@ wazuh-elasticsearch:
         limits:
           cpu: 1
           memory: 2Gi
+      ports: *wazuh-elasticsearch-ports    
 wazuh-managers:
   volume-mount-hack: *volume-mount-hack
   master-sts:
@@ -58,6 +73,13 @@ wazuh-managers:
       limits:
         cpu: 2
         memory: 2048Mi
+    ports:
+      - containerPort: 1515
+        name: registration
+      - containerPort: 1516
+        name: cluster
+      - containerPort: 55000
+        name: api    
   worker-sts:
     image: wazuh/wazuh
     version: *version
@@ -68,6 +90,11 @@ wazuh-managers:
       limits:
         cpu: 2
         memory: 2048Mi
+    ports:
+      - containerPort: 1514
+        name: agents-events
+      - containerPort: 1516
+        name: cluster    
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
   image: wazuh/wazuh-kibana
@@ -79,6 +106,9 @@ wazuh-kibana:
     limits:
       cpu: 400m
       memory: 2048Mi
+  ports:
+    - containerPort: 5601
+      name: kibana    
   nginx:
     image: wazuh/wazuh-nginx
     version: *version
@@ -89,4 +119,7 @@ wazuh-kibana:
       limits:
         cpu: 200m
         memory: 128Mi
+    ports:
+      - containerPort: 80
+      - containerPort: 443    
   

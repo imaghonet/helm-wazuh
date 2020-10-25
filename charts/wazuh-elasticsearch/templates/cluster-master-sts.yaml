@@ -82,11 +82,10 @@ spec:
           volumeMounts:
             - name: {{ template "app.name" . }}-elasticsearch
               mountPath: /usr/share/elasticsearch/data
+          {{- with (index .Values.cluster "master-sts" "ports") }}
           ports:
-            - containerPort: 9200
-              name: es-rest
-            - containerPort: 9300
-              name: es-nodes
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: {{ template "app.name" . }}-elasticsearch

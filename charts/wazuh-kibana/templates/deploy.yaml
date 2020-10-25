@@ -30,9 +30,10 @@ spec:
           resources:
           {{- .|toYaml|nindent 12}}
           {{- end }} 
+          {{- with .Values.ports }}
           ports:
-            - containerPort: 5601
-              name: kibana
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
           env:
             - name: ELASTICSEARCH_URL
               value: 'http://elasticsearch:9200'

@@ -51,11 +51,10 @@ spec:
               readOnly: true
             - name: {{ template "app.name" . }}-manager-worker
               mountPath: /var/ossec/data
+          {{- with (index .Values "worker-sts" "ports") }}
           ports:
-            - containerPort: 1514
-              name: agents-events
-            - containerPort: 1516
-              name: cluster
+          {{- .|toYaml|nindent 12}}
+          {{- end }}  
           env:
             - name: API_USER
               valueFrom:

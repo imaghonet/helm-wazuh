@@ -37,6 +37,7 @@ spec:
               value: 'foo'
             - name: NGINX_PWD
               value: 'bar'
+          {{- with .Values.nginx.ports }}
           ports:
-            - containerPort: 80
-            - containerPort: 443
+          {{- .|toYaml|nindent 12}}
+          {{- end }}
