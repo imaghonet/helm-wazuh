@@ -67,6 +67,8 @@ spec:
                 secretKeyRef:
                   name: {{ template "app.name" . }}-cluster-key
                   key: key
+            - name: ELASTICSEARCH_URL
+              value: "wazuh-elasticsearch-elasticsearch:{{ index .Values "es-rest-port" }}"      
 {{- if .Values.persistentVolume }} 
           volumeMounts:
             {{- range $vmName, $vmData := .Values.persistentVolume }}

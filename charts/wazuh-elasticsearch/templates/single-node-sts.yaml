@@ -80,6 +80,8 @@ spec:
               value: 0.0.0.0
             - name: node.name
               value: node-1
+            - name: ELASTICSEARCH_URL
+              value: "{{ template "app.name" . }}-elasticsearch:{{ index .Values "es-rest-port" }}"
           {{- with (index .Values "single-node" "sts" "ports") }}
           ports:
           {{- .|toYaml|nindent 12}}

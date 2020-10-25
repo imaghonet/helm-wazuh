@@ -92,6 +92,8 @@ spec:
               value: {{ template "app.name" . }}-elasticsearch
             - name: discovery.zen.minimum_master_nodes
               value: "2"
+            - name: ELASTICSEARCH_URL
+              value: "{{ template "app.name" . }}-elasticsearch:{{ index .Values "es-rest-port" }}"  
           {{- with (index .Values.cluster "master-sts" "ports") }}    
           ports:
           {{- .|toYaml|nindent 12}}

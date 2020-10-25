@@ -90,6 +90,8 @@ spec:
                   fieldPath: metadata.name
             - name: discovery.zen.ping.unicast.hosts
               value: {{ template "app.name" . }}-elasticsearch
+            - name: ELASTICSEARCH_URL
+              value: "{{ template "app.name" . }}-elasticsearch:{{ index .Values "es-rest-port" }}"  
           {{- with (index .Values.cluster "data-sts" "ports") }}    
           ports:
           {{- .|toYaml|nindent 12}}
