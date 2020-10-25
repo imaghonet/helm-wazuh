@@ -11,12 +11,18 @@ volume-mount-hack: &volume-mount-hack
 
 api-port: &api-port 55000
 es-rest-port: &es-rest-port 9200
-
+es-nodes-port: &es-nodes-port 9300
+registration-port: &registration-port 1515
+cluster-port: &cluster-port 1516
+agents-events-port: &agents-events-port 1514
+web-https-port: &web-https-port 443
+kibana-port: &kibana-port 5601
+  
 wazuh-elasticsearch:
   volume-mount-hack: *volume-mount-hack
   image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
   es-rest-port: *es-rest-port
-  es-nodes-port: &es-nodes-port 9300
+  es-nodes-port: *es-nodes-port
   ports: &wazuh-elasticsearch-ports
     - containerPort: *es-rest-port
       name: es-rest
@@ -95,10 +101,10 @@ wazuh-elasticsearch:
         targetPort: *es-rest-port  
 wazuh-managers: 
   volume-mount-hack: *volume-mount-hack  
-  registration-port: &registration-port 1515
-  cluster-port: &cluster-port 1516
+  registration-port: *registration-port
+  cluster-port: *cluster-port
   api-port: *api-port
-  agents-events-port: &agents-events-port 1514
+  agents-events-port: *agents-events-port
   master-sts:
     image: wazuh/wazuh
     version: *version
@@ -167,8 +173,8 @@ wazuh-managers:
       targetPort: *agents-events-port   
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
-  web-https-port: &web-https-port 443
-  kibana-port: &kibana-port 5601  
+  web-https-port: *web-https-port
+  kibana-port: *kibana-port 
   image: wazuh/wazuh-kibana
   api-port: *api-port
   version: *version
