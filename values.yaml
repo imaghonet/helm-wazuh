@@ -161,9 +161,9 @@ wazuh-managers:
       - containerPort: *api-port
         name: api 
     env:
-      - API_USER: *api-cred-username
-      - API_PASS: *api-cred-password
-      - WAZUH_CLUSTER_KEY: *wazuh-cluster-key   
+      API_USER: *api-cred-username
+      API_PASS: *api-cred-password
+      WAZUH_CLUSTER_KEY: *wazuh-cluster-key   
     persistentVolume:     
       wazuh-managers-manager-master:
           mountPath: /var/ossec/data
