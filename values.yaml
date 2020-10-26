@@ -163,7 +163,7 @@ wazuh-managers:
       targetPort: *api-port
     annotations: {}  
 #    annotations:
-##      domainName: 'changeme'
+##      domainName: changeme
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp  
   cluster-svc:
     ports:
@@ -177,7 +177,7 @@ wazuh-managers:
       targetPort: *agents-events-port
     annotations: {}  
 #    annotations:
-##      domainName: 'wazuh-manager.some-domain.com'  # TODO: Change this for a Hosted Zone you configured in AWS Route 53
+##      domainName: wazuh-manager.some-domain.com  # TODO: Change this for a Hosted Zone you configured in AWS Route 53
 #      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0  
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
@@ -221,8 +221,8 @@ wazuh-kibana:
       targetPort: *web-https-port
     annotations: {}  
 #    annotations:
-##      domainName: 'changeme'
-##      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: 'changeme'
-#      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: '443'
+##      domainName: changeme
+##      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: changeme
+#      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 443
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https  
   
