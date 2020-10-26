@@ -17,7 +17,7 @@ metadata:
   labels:
     app: {{ template "app.name" . }}-elasticsearch
 spec:
-  type: LoadBalancer
+  type: {{ (index .Values.cluster "api-svc" "type") }}
   selector:
     app: {{ template "app.name" . }}-elasticsearch
   {{- with (index .Values.cluster "api-svc" "ports") }}

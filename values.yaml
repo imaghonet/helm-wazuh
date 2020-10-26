@@ -90,6 +90,8 @@ wazuh-elasticsearch:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port
+      type: ClusterIP
+#      type: LoadBalancer  
     svc: 
       ports:
       - name: es-nodes
@@ -129,6 +131,8 @@ wazuh-elasticsearch:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port  
+      type: ClusterIP
+#      type: LoadBalancer  
 wazuh-managers: 
   volume-mount-hack: *volume-mount-hack  
   registration-port: *registration-port
@@ -207,7 +211,9 @@ wazuh-managers:
     annotations: {}  
 #    annotations:
 ##      domainName: changeme
-#      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp  
+#      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp 
+    type: ClusterIP
+#    type: LoadBalancer
   cluster-svc:
     ports:
     - name: cluster
@@ -222,6 +228,8 @@ wazuh-managers:
 #    annotations:
 ##      domainName: wazuh-manager.some-domain.com  # TODO: Change this for a Hosted Zone you configured in AWS Route 53
 #      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0  
+    type: ClusterIP
+#    type: LoadBalancer
 wazuh-kibana:
   volume-mount-hack: *volume-mount-hack
   web-https-port: *web-https-port
@@ -280,4 +288,6 @@ wazuh-kibana:
 ##      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: changeme
 #      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 443
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https  
+    type: ClusterIP
+#    type: LoadBalancer
   

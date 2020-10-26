@@ -21,7 +21,7 @@ metadata:
 {{ toYaml (index .Values "master-svc" "annotations") | indent 4 }}
 {{- end }}    
 spec:
-  type: LoadBalancer
+  type: {{ (index .Values "master-svc" "type") }}
   selector:
     app: {{ template "app.name" . }}-manager
     node-type: master

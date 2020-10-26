@@ -20,7 +20,7 @@ metadata:
 {{ toYaml (index .Values "nginx-svc" "annotations") | indent 4 }}
 {{- end }}    
 spec:
-  type: LoadBalancer
+  type: {{ (index .Values "nginx-svc" "type") }}
   selector:
     app: {{ template "app.name" . }}-nginx
   {{- with (index .Values "nginx-svc" "ports") }}

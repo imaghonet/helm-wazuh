@@ -20,7 +20,7 @@ metadata:
 {{ toYaml (index .Values "workers-svc" "annotations") | indent 4 }}
 {{- end }}    
 spec:
-  type: LoadBalancer
+  type: {{ (index .Values "workers-svc" "type") }}
   selector:
     app: {{ template "app.name" . }}-manager
     node-type: worker
