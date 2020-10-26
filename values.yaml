@@ -277,7 +277,7 @@ wazuh-kibana:
       - containerPort: *web-https-port 
     env:
       KIBANA_HOST: wazuh-kibana-kibana
-      NGINX_PORT: 443
+      NGINX_PORT: *web-https-port 
       NGINX_NAME: foo
       NGINX_PWD: bar  
   nginx-svc:
