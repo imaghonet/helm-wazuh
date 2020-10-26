@@ -14,18 +14,30 @@ api-cred-password: &api-cred-password YmFy # string "bar" base64 encoded
 wazuh-cluster-key: &wazuh-cluster-key MTIzYTQ1YmM2N2RlZjg5MWdoMjNpNDVqazY3bDhtbjk= # string "123a45bc67def891gh23i45jk67l8mn9" base64 encoded
 authd-password: &authd-password cGFzc3dvcmQ= # string "password" base64 encoded
   
-wazuh-elasticsearch:
-  volume-mount-hack: *volume-mount-hack
-  image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
+volume-mount-hack: &volume-mount-hack
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 256Mi
+  
+wazuh-elasticsearch:    
   es-rest-port: *es-rest-port
-  es-nodes-port: *es-nodes-port
+  es-nodes-port: *es-nodes-port  
+  volume-mount-hack: *volume-mount-hack  
+  
+  image: &wazuh-elasticsearch-image wazuh/wazuh-elasticsearch
   ports: &wazuh-elasticsearch-ports
     - containerPort: *es-rest-port
       name: es-rest
     - containerPort: *es-nodes-port
       name: es-nodes
+      
   cluster:
-    enabled: false
+    enabled: false  
+    
     elasticsearchPersistentVolumeCluster: &elasticsearchPersistentVolumeCluster
       wazuh-elasticsearch-elasticsearch:
         mountPath: /usr/share/elasticsearch/data
@@ -33,19 +45,20 @@ wazuh-elasticsearch:
         capacity: 10Gi
         storageClassName: microk8s-hostpath
         accessModes:
-          - ReadWriteOnce
+          - ReadWriteOnce 
+          
     data-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      ports: *wazuh-elasticsearch-ports
+      persistentVolume: *elasticsearchPersistentVolumeCluster        
       resources:
         requests:
           cpu: 500m
           memory: 1Gi
         limits:
           cpu: 1
-          memory: 2Gi
-      ports: *wazuh-elasticsearch-ports
-      persistentVolume: *elasticsearchPersistentVolumeCluster 
+          memory: 2Gi      
       env:
         ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
         node.master: false
@@ -56,19 +69,20 @@ wazuh-elasticsearch:
         network.host: 0.0.0.0
         node.name: wazuh-elasticsearch-data-elasticsearch
         discovery.zen.ping.unicast.hosts: wazuh-elasticsearch-elasticsearch
-        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
+        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200 
+        
     master-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      ports: *wazuh-elasticsearch-ports      
+      persistentVolume: *elasticsearchPersistentVolumeCluster      
       resources:
         requests:
           cpu: 500m
           memory: 1Gi
         limits:
           cpu: 1
-          memory: 2Gi
-      ports: *wazuh-elasticsearch-ports
-      persistentVolume: *elasticsearchPersistentVolumeCluster
+          memory: 2Gi      
       env:
         ES_JAVA_OPTS: '-Xms512m -Xmx512m'
         node.master: true
@@ -80,20 +94,25 @@ wazuh-elasticsearch:
         node.name: wazuh-elasticsearch-elasticsearch
         discovery.zen.ping.unicast.hosts: wazuh-elasticsearch-elasticsearch
         discovery.zen.minimum_master_nodes: 2
-        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200 
+        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
+        
     api-svc:
       ports:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port
       type: ClusterIP
-#      type: LoadBalancer  
+#      type: LoadBalancer 
+
     svc: 
       ports:
       - name: es-nodes
         port: *es-nodes-port
         targetPort: *es-nodes-port
+        
   single-node:
+    enabled: true
+    
     elasticsearchPersistentVolumeSingleNode: &elasticsearchPersistentVolumeSingleNode
       wazuh-elasticsearch-elasticsearch:
         mountPath: /usr/share/elasticsearch/data
@@ -102,19 +121,19 @@ wazuh-elasticsearch:
         storageClassName: microk8s-hostpath
         accessModes:
           - ReadWriteOnce
-    enabled: true
+          
     sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
+      ports: *wazuh-elasticsearch-ports   
+      persistentVolume: *elasticsearchPersistentVolumeSingleNode      
       resources:
         requests:
           cpu: 500m
           memory: 1Gi
         limits:
           cpu: 1
-          memory: 2Gi
-      ports: *wazuh-elasticsearch-ports   
-      persistentVolume: *elasticsearchPersistentVolumeSingleNode
+          memory: 2Gi      
       env:
         ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
         bootstrap.memory_lock: false
@@ -122,13 +141,15 @@ wazuh-elasticsearch:
         network.host: 0.0.0.0
         node.name: node-1
         ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
+        
     api-svc:
       ports:
       - name: es-rest
         port: *es-rest-port
         targetPort: *es-rest-port  
       type: ClusterIP
-#      type: LoadBalancer  
+#      type: LoadBalancer 
+
 wazuh-managers: 
   registration-port: *registration-port
   cluster-port: *cluster-port
@@ -142,7 +163,7 @@ wazuh-managers:
   
   master-sts:
     image: wazuh/wazuh
-    version: *version
+    version: *version    
     resources:
       requests:
         cpu: 2
@@ -170,6 +191,7 @@ wazuh-managers:
           storageClassName: microk8s-hostpath
           accessModes:
             - ReadWriteOnce 
+            
   worker-sts:
     image: wazuh/wazuh
     version: *version
@@ -198,6 +220,7 @@ wazuh-managers:
           storageClassName: microk8s-hostpath
           accessModes:
             - ReadWriteOnce
+            
   master-svc:
     ports:
     - name: registration
@@ -212,11 +235,13 @@ wazuh-managers:
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp 
     type: ClusterIP
 #    type: LoadBalancer
+
   cluster-svc:
     ports:
     - name: cluster
       port: *cluster-port
-      targetPort: *cluster-port       
+      targetPort: *cluster-port 
+      
   workers-svc:
     ports:
     - name: agents-events
@@ -228,13 +253,15 @@ wazuh-managers:
 #      service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0  
     type: ClusterIP
 #    type: LoadBalancer
-wazuh-kibana:
-  volume-mount-hack: *volume-mount-hack
+
+wazuh-kibana:  
   web-https-port: *web-https-port
   kibana-port: *kibana-port 
   image: wazuh/wazuh-kibana
   api-port: *api-port
-  version: *version
+  version: *version  
+  volume-mount-hack: *volume-mount-hack
+  
   resources:
     requests:
       cpu: 200m
@@ -253,12 +280,14 @@ wazuh-kibana:
     WAZUH_API_URL: wazuh-managers-wazuh
     API_PORT: *api-port
     API_USER: foo
-    API_PASS: bar      
+    API_PASS: bar 
+    
   svc:
     ports:
     - name: kibana
       port: *kibana-port
       targetPort: *kibana-port
+      
   nginx:
     image: wazuh/wazuh-nginx
     version: *version
@@ -276,7 +305,8 @@ wazuh-kibana:
       KIBANA_HOST: wazuh-kibana-kibana:5601
       NGINX_PORT: *web-https-port 
       NGINX_NAME: foo
-      NGINX_PWD: bar  
+      NGINX_PWD: bar
+      
   nginx-svc:
     ports:
     - name: web-https
@@ -289,5 +319,4 @@ wazuh-kibana:
 #      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: *web-https-port
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https  
     type: ClusterIP
-#    type: LoadBalancer
-  
+#    type: LoadBalancer  
