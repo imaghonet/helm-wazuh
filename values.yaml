@@ -289,7 +289,7 @@ wazuh-kibana:
 #    annotations:
 ##      domainName: changeme
 ##      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: changeme
-#      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 443
+#      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: *web-https-port
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https  
     type: ClusterIP
 #    type: LoadBalancer
