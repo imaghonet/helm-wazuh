@@ -1,14 +1,5 @@
 version: &version 3.13.2_7.9.1
 
-volume-mount-hack: &volume-mount-hack
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 100m
-      memory: 256Mi
-
 api-port: &api-port 55000
 es-rest-port: &es-rest-port 9200
 es-nodes-port: &es-nodes-port 9300
@@ -17,6 +8,11 @@ cluster-port: &cluster-port 1516
 agents-events-port: &agents-events-port 1514
 web-https-port: &web-https-port 443
 kibana-port: &kibana-port 5601
+      
+api-cred-username: &api-cred-username Zm9v # string "foo" base64 encoded
+api-cred-password: &api-cred-password YmFy # string "bar" base64 encoded
+wazuh-cluster-key: &wazuh-cluster-key MTIzYTQ1YmM2N2RlZjg5MWdoMjNpNDVqazY3bDhtbjk= # string "123a45bc67def891gh23i45jk67l8mn9" base64 encoded
+authd-password: &authd-password cGFzc3dvcmQ= # string "password" base64 encoded
   
 wazuh-elasticsearch:
   volume-mount-hack: *volume-mount-hack
@@ -134,15 +130,16 @@ wazuh-elasticsearch:
       type: ClusterIP
 #      type: LoadBalancer  
 wazuh-managers: 
-  volume-mount-hack: *volume-mount-hack  
   registration-port: *registration-port
   cluster-port: *cluster-port
   api-port: *api-port
   agents-events-port: *agents-events-port
-  api-cred-username: &api-cred-username Zm9v # string "foo" base64 encoded
-  api-cred-password: &api-cred-password YmFy # string "bar" base64 encoded
-  wazuh-cluster-key: &wazuh-cluster-key MTIzYTQ1YmM2N2RlZjg5MWdoMjNpNDVqazY3bDhtbjk= # string "123a45bc67def891gh23i45jk67l8mn9" base64 encoded
-  authd-password: cGFzc3dvcmQ= # string "password" base64 encoded
+  api-cred-username: *api-cred-username
+  api-cred-password: *api-cred-password
+  wazuh-cluster-key: *wazuh-cluster-key
+  authd-password: *authd-password  
+  volume-mount-hack: *volume-mount-hack  
+  
   master-sts:
     image: wazuh/wazuh
     version: *version
