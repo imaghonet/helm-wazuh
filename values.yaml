@@ -163,7 +163,8 @@ wazuh-managers:
     env:
       API_USER: *api-cred-username
       API_PASS: *api-cred-password
-      WAZUH_CLUSTER_KEY: *wazuh-cluster-key   
+      WAZUH_CLUSTER_KEY: *wazuh-cluster-key 
+      ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200 
     persistentVolume:     
       wazuh-managers-manager-master:
           mountPath: /var/ossec/data
@@ -248,7 +249,9 @@ wazuh-kibana:
     - containerPort: *kibana-port
       name: kibana
   env:
-    ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
+    ELASTICSEARCH_URL: http://wazuh-elasticsearch-elasticsearch:9200
+    ELASTICSEARCH_KIBANA_IP: http://wazuh-elasticsearch-elasticsearch:9200
+    KIBANA_IP: wazuh-kibana-kibana
     NODE_OPTIONS: '--max-old-space-size=2048'
     WAZUH_API_URL: wazuh-managers-wazuh
     API_PORT: *api-port
