@@ -16,9 +16,10 @@ metadata:
   labels:
     app: {{ template "app.name" . }}-manager
     # dns: route53
+{{- if (index .Values "master-svc" "annotations") }}    
   annotations:
-    # domainName: 'changeme'
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
+{{ toYaml (index .Values "master-svc" "annotations") | indent 4 }}
+{{- end }}    
 spec:
   type: LoadBalancer
   selector:

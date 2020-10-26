@@ -15,9 +15,10 @@ metadata:
   labels:
     app: {{ template "app.name" . }}-manager
     # dns: route53
+{{- if (index .Values "workers-svc" "annotations") }}    
   annotations:
-    # domainName: 'wazuh-manager.some-domain.com'  # TODO: Change this for a Hosted Zone you configured in AWS Route 53
-    service.beta.kubernetes.io/aws-load-balancer-internal: 0.0.0.0/0
+{{ toYaml (index .Values "workers-svc" "annotations") | indent 4 }}
+{{- end }}    
 spec:
   type: LoadBalancer
   selector:
