@@ -276,7 +276,7 @@ wazuh-kibana:
       - containerPort: 80
       - containerPort: *web-https-port 
     env:
-      KIBANA_HOST: wazuh-kibana-kibana
+      KIBANA_HOST: wazuh-kibana-kibana:5601
       NGINX_PORT: *web-https-port 
       NGINX_NAME: foo
       NGINX_PWD: bar  
