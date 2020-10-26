@@ -49,7 +49,18 @@ wazuh-elasticsearch:
           cpu: 1
           memory: 2Gi
       ports: *wazuh-elasticsearch-ports
-      persistentVolume: *elasticsearchPersistentVolumeCluster        
+      persistentVolume: *elasticsearchPersistentVolumeCluster 
+      env:
+        ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
+        node.master: false
+        node.data: true
+        node.ingest: false
+        bootstrap.memory_lock: false
+        cluster.name: wazuh
+        network.host: 0.0.0.0
+        node.name: wazuh-elasticsearch-data-elasticsearch
+        discovery.zen.ping.unicast.hosts: wazuh-elasticsearch-elasticsearch
+        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
     master-sts:
       image: wazuh/wazuh-elasticsearch
       version: *version
@@ -62,6 +73,18 @@ wazuh-elasticsearch:
           memory: 2Gi
       ports: *wazuh-elasticsearch-ports
       persistentVolume: *elasticsearchPersistentVolumeCluster
+      env:
+        ES_JAVA_OPTS: '-Xms512m -Xmx512m'
+        node.master: true
+        node.data: false
+        node.ingest: false
+        bootstrap.memory_lock: false
+        cluster.name: wazuh
+        network.host: 0.0.0.0
+        node.name: wazuh-elasticsearch-elasticsearch
+        discovery.zen.ping.unicast.hosts: wazuh-elasticsearch-elasticsearch
+        discovery.zen.minimum_master_nodes: 2
+        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200 
     api-svc:
       ports:
       - name: es-rest
@@ -94,6 +117,13 @@ wazuh-elasticsearch:
           memory: 2Gi
       ports: *wazuh-elasticsearch-ports   
       persistentVolume: *elasticsearchPersistentVolumeSingleNode
+      env:
+        ES_JAVA_OPTS: '-Xms1024m -Xmx1024m'
+        bootstrap.memory_lock: false
+        cluster.name: wazuh
+        network.host: 0.0.0.0
+        node.name: node-1
+        ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
     api-svc:
       ports:
       - name: es-rest
@@ -105,6 +135,9 @@ wazuh-managers:
   cluster-port: *cluster-port
   api-port: *api-port
   agents-events-port: *agents-events-port
+  api-cred-username: &api-cred-username Zm9v # string "foo" base64 encoded
+  api-cred-password: &api-cred-password YmFy # string "bar" base64 encoded
+  wazuh-cluster-key: &wazuh-cluster-key MTIzYTQ1YmM2N2RlZjg5MWdoMjNpNDVqazY3bDhtbjk= # string "123a45bc67def891gh23i45jk67l8mn9" base64 encoded
   master-sts:
     image: wazuh/wazuh
     version: *version
@@ -121,7 +154,11 @@ wazuh-managers:
       - containerPort: *cluster-port
         name: cluster
       - containerPort: *api-port
-        name: api    
+        name: api 
+    env:
+      - API_USER: *api-cred-username
+      - API_PASS: *api-cred-password
+      - WAZUH_CLUSTER_KEY: *wazuh-cluster-key   
     persistentVolume:     
       wazuh-managers-manager-master:
           mountPath: /var/ossec/data
@@ -144,7 +181,12 @@ wazuh-managers:
       - containerPort: *agents-events-port
         name: agents-events
       - containerPort: *cluster-port
-        name: cluster 
+        name: cluster
+    env:
+      API_USER: *api-cred-username
+      API_PASS: *api-cred-password
+      WAZUH_CLUSTER_KEY: *wazuh-cluster-key
+      ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200  
     persistentVolume:     
       wazuh-managers-manager-worker:
           mountPath: /var/ossec/data
@@ -196,6 +238,13 @@ wazuh-kibana:
   ports:
     - containerPort: *kibana-port
       name: kibana
+  env:
+    ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200
+    NODE_OPTIONS: '--max-old-space-size=2048'
+    WAZUH_API_URL: wazuh-managers-wazuh
+    API_PORT: *api-port
+    API_USER: foo
+    API_PASS: bar      
   svc:
     ports:
     - name: kibana
@@ -214,6 +263,11 @@ wazuh-kibana:
     ports:
       - containerPort: 80
       - containerPort: *web-https-port 
+    env:
+      KIBANA_HOST: wazuh-kibana-kibana
+      NGINX_PORT: 443
+      NGINX_NAME: foo
+      NGINX_PWD: bar  
   nginx-svc:
     ports:
     - name: web-https

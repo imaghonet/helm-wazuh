@@ -52,23 +52,10 @@ spec:
           {{- .|toYaml|nindent 12}}
           {{- end }}
           env:
-            - name: API_USER
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "app.name" . }}-api-cred
-                  key: username
-            - name: API_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "app.name" . }}-api-cred
-                  key: password
-            - name: WAZUH_CLUSTER_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ template "app.name" . }}-cluster-key
-                  key: key
-            - name: ELASTICSEARCH_URL
-              value: "wazuh-elasticsearch-elasticsearch:{{ index .Values "es-rest-port" }}"      
+          {{- range $key, $value := (index .Values "worker-sts" "env")}}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}      
 {{- if .Values.persistentVolume }} 
           volumeMounts:
             {{- range $vmName, $vmData := .Values.persistentVolume }}

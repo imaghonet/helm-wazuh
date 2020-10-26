@@ -29,16 +29,12 @@ spec:
           {{- with .Values.nginx.resources }}
           resources:
           {{- .|toYaml|nindent 12}}
-          {{- end }}          
+          {{- end }}  
           env:
-            - name: KIBANA_HOST
-              value: wazuh-kibana-kibana
-            - name: NGINX_PORT
-              value: '443'
-            - name: NGINX_NAME
-              value: 'foo'
-            - name: NGINX_PWD
-              value: 'bar'
+          {{- range $key, $value := .Values.nginx.env }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}
           {{- with .Values.nginx.ports }}
           ports:
           {{- .|toYaml|nindent 12}}

@@ -70,18 +70,10 @@ spec:
           {{- .|toYaml|nindent 12}}
           {{- end }}
           env:
-            - name: ES_JAVA_OPTS
-              value: '-Xms1024m -Xmx1024m'
-            - name: bootstrap.memory_lock
-              value: 'false'
-            - name: cluster.name
-              value: wazuh
-            - name: network.host
-              value: 0.0.0.0
-            - name: node.name
-              value: node-1
-            - name: ELASTICSEARCH_URL
-              value: "{{ template "app.name" . }}-elasticsearch:{{ index .Values "es-rest-port" }}"
+          {{- range $key, $value := (index .Values "single-node" "sts" "env") }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}
           {{- with (index .Values "single-node" "sts" "ports") }}
           ports:
           {{- .|toYaml|nindent 12}}

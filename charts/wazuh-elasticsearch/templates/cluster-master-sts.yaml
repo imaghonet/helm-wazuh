@@ -70,30 +70,10 @@ spec:
           {{- .|toYaml|nindent 12}}
           {{- end }}
           env:
-            - name: ES_JAVA_OPTS
-              value: '-Xms512m -Xmx512m'
-            - name: node.master
-              value: 'true'
-            - name: node.data
-              value: 'false'
-            - name: node.ingest
-              value: 'false'
-            - name: bootstrap.memory_lock
-              value: 'false'
-            - name: cluster.name
-              value: wazuh
-            - name: network.host
-              value: 0.0.0.0
-            - name: node.name
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: discovery.zen.ping.unicast.hosts
-              value: {{ template "app.name" . }}-elasticsearch
-            - name: discovery.zen.minimum_master_nodes
-              value: "2"
-            - name: ELASTICSEARCH_URL
-              value: "{{ template "app.name" . }}-elasticsearch:{{ index .Values "es-rest-port" }}"  
+          {{- range $key, $value := (index .Values.cluster "master-sts" "env") }}
+          - name: {{ $key }}
+            value: {{ $value | quote }}
+          {{- end }}  
           {{- with (index .Values.cluster "master-sts" "ports") }}    
           ports:
           {{- .|toYaml|nindent 12}}
