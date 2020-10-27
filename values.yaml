@@ -277,7 +277,7 @@ wazuh-kibana:
     ELASTICSEARCH_KIBANA_IP: http://wazuh-elasticsearch-elasticsearch:9200
     KIBANA_IP: wazuh-kibana-kibana
     NODE_OPTIONS: '--max-old-space-size=2048'
-    WAZUH_API_URL: https://wazuh-managers-wazuh
+    WAZUH_API_URL: https://wazuh-managers-master
     API_PORT: *api-port
     API_USER: *api-cred-username
     API_PASS: *api-cred-password
