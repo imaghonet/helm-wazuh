@@ -56,9 +56,9 @@ spec:
           - name: {{ $key }}
             value: {{ $value | quote }}
           {{- end }}      
-{{- if .Values.persistentVolume }} 
+{{- if (index .Values "worker-sts" "persistentVolume") }} 
           volumeMounts:
-            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            {{- range $vmName, $vmData := (index .Values "worker-sts" "persistentVolume") }}
             - mountPath: {{ $vmData.mountPath }}
               name: {{ $vmName }}
             {{- end }} 
@@ -67,7 +67,7 @@ spec:
               subPath: ossec.conf
               readOnly: true            
       volumes:
-        {{- range $vmName, $vmData := .Values.persistentVolume }}
+        {{- range $vmName, $vmData := (index .Values "worker-sts" "persistentVolume") }}
         {{- if $vmData.existingClaim }}
         - name: {{ $vmName }}
           persistentVolumeClaim:
@@ -78,11 +78,11 @@ spec:
           configMap:
             name: {{ template "app.name" . }}-manager-worker-conf       
   volumeClaimTemplates:
-    {{- range $vmName, $vmData := .Values.persistentVolume }}
+    {{- range $vmName, $vmData := (index .Values "worker-sts" "persistentVolume") }}
       {{- if (not $vmData.existingClaim) }}
     - metadata:
         name: {{ $vmName }}
-        namespace: {{ .Release.Namespace }}
+        namespace: {{ $this.Release.Namespace }}
       spec:
           {{- if (not $vmData.storageClassName) }}
         selector:

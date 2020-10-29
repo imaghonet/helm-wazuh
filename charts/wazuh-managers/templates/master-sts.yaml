@@ -50,9 +50,9 @@ spec:
           - name: {{ $key }}
             value: {{ $value | quote }}
           {{- end }}
-{{- if .Values.persistentVolume }} 
+{{- if (index .Values "master-sts" "persistentVolume") }} 
           volumeMounts:
-            {{- range $vmName, $vmData := .Values.persistentVolume }}
+            {{- range $vmName, $vmData := (index .Values "master-sts" "persistentVolume") }}
             - mountPath: {{ $vmData.mountPath }}
               name: {{ $vmName }}
             {{- end }}
@@ -65,7 +65,7 @@ spec:
               subPath: authd.pass
               readOnly: true
       volumes:
-        {{- range $vmName, $vmData := .Values.persistentVolume }}
+        {{- range $vmName, $vmData := (index .Values "master-sts" "persistentVolume") }}
         {{- if $vmData.existingClaim }}
         - name: {{ $vmName }}
           persistentVolumeClaim:
@@ -79,11 +79,11 @@ spec:
           secret:
             secretName: {{ template "app.name" . }}-authd-pass      
   volumeClaimTemplates:
-    {{- range $vmName, $vmData := .Values.persistentVolume }}
+    {{- range $vmName, $vmData := (index .Values "master-sts" "persistentVolume") }}
       {{- if (not $vmData.existingClaim) }}
     - metadata:
         name: {{ $vmName }}
-        namespace: {{ .Release.Namespace }}
+        namespace: {{ $this.Release.Namespace }}
       spec:
           {{- if (not $vmData.storageClassName) }}
         selector:
