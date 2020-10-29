@@ -11,7 +11,7 @@ kibana-port: &kibana-port 5601
       
 api-cred-username: &api-cred-username Zm9v # string "foo" base64 encoded
 api-cred-password: &api-cred-password YmFy # string "bar" base64 encoded
-wazuh-cluster-key: &wazuh-cluster-key MTIzYTQ1YmM2N2RlZjg5MWdoMjNpNDVqazY3bDhtbjk= # string "123a45bc67def891gh23i45jk67l8mn9" base64 encoded
+wazuh-cluster-key: &wazuh-cluster-key 3a4f5f1d39c889a84a2c3d7c3c866715 # openssl rand -hex 16
 authd-password: &authd-password cGFzc3dvcmQ= # string "password" base64 encoded
   
 volume-mount-hack: &volume-mount-hack

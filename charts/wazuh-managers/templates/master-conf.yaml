@@ -316,7 +316,7 @@ data:
         <name>wazuh</name>
         <node_name>wazuh-manager-master</node_name>
         <node_type>master</node_type>
-        <key>to_be_replaced_by_cluster_key</key>
+        <key>3a4f5f1d39c889a84a2c3d7c3c866715</key>
         <port>1516</port>
         <bind_addr>0.0.0.0</bind_addr>
         <nodes>
