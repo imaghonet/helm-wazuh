@@ -314,7 +314,7 @@ data:
 
       <cluster>
         <name>wazuh</name>
-        <node_name>to_be_replaced_by_hostname</node_name>
+        <node_name>wazuh-manager-worker</node_name>
         <node_type>worker</node_type>
         <key>3a4f5f1d39c889a84a2c3d7c3c866715</key>
         <port>1516</port>
