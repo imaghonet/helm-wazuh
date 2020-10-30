@@ -211,7 +211,13 @@ wazuh-managers:
       API_USER: *api-cred-username
       API_PASS: *api-cred-password
       WAZUH_CLUSTER_KEY: *wazuh-cluster-key
-      ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200  
+      ELASTICSEARCH_URL: wazuh-elasticsearch-elasticsearch:9200 
+    affinities:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname  
     persistentVolume:     
       wazuh-managers-manager-worker:
           mountPath: /var/ossec/data

@@ -33,6 +33,18 @@ spec:
         app: {{ template "app.name" . }}-elasticsearch
       name: {{ template "app.name" . }}-elasticsearch
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       # Set the wazuh-elasticsearch volume permissions so the elasticsearch user can use it!
       initContainers:
 {{- if (index .Values.cluster "master-sts" "persistentVolume") }}        

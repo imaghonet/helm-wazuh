@@ -23,6 +23,18 @@ spec:
         app: {{ template "app.name" . }}-kibana
       name: {{ template "app.name" . }}-kibana
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ template "app.name" . }}-kibana
           image: "{{ .Values.image }}:{{ .Values.version }}"

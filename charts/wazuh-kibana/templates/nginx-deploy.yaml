@@ -23,6 +23,18 @@ spec:
         app: {{ template "app.name" . }}-nginx
       name: {{ template "app.name" . }}-nginx
     spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ template "app.name" . }}-nginx
           image: "{{ .Values.nginx.image }}:{{ .Values.nginx.version }}"
