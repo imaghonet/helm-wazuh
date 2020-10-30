@@ -117,23 +117,23 @@ data:
         <processes>yes</processes>
       </wodle>
 
-      <wodle name="vulnerability-detector">
-        <disabled>yes</disabled>
+      <vulnerability-detector>
+        <enabled>no</enabled>
         <interval>1m</interval>
         <run_on_start>yes</run_on_start>
-        <feed name="ubuntu-18">
-          <disabled>yes</disabled>
+        <provider name="canonical">
+          <enabled>no</enabled>
           <update_interval>1h</update_interval>
-        </feed>
-        <feed name="redhat-7">
-          <disabled>yes</disabled>
+        </provider>
+        <provider name="redhat">
+          <enabled>no</enabled>
           <update_interval>1h</update_interval>
-        </feed>
-        <feed name="debian-9">
-          <disabled>yes</disabled>
+        </provider>
+        <provider name="debian">
+          <enabled>no</enabled>
           <update_interval>1h</update_interval>
-        </feed>
-      </wodle>
+        </provider>
+      </vulnerability-detector>
 
       <!-- File integrity monitoring -->
       <syscheck>
