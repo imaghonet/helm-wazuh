@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  gather_facts: False
+  strategy: debug
+  roles:
+    - role: wazuh-agent
