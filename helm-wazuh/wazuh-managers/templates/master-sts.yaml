@@ -67,7 +67,8 @@ spec:
           - >
             ./entrypoint.sh &&
             openssl req -new -x509 -key /var/ossec/etc/sslmanager.key -out /var/ossec/etc/sslmanager.cert -days 365 -batch &&
-            /var/ossec/bin/ossec-control restart
+            #/var/ossec/bin/ossec-control restart
+            service wazuh-manager restart
 {{- if (index .Values "master-sts" "persistentVolume") }} 
           volumeMounts:
             {{- range $vmName, $vmData := (index .Values "master-sts" "persistentVolume") }}
