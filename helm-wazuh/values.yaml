@@ -328,5 +328,6 @@ wazuh-kibana:
 #    type: LoadBalancer  
 
 agent:
+  name: test
   address: 172.19.0.3
   subnet: 172.19.0.0/24

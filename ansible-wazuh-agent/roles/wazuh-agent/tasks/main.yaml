@@ -25,7 +25,7 @@
   raw: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -out /var/ossec/etc/sslmanager.cert -keyout /var/ossec/etc/sslmanager.key -batch
 
 - name: Adding the agent to the manager using the registration service - Wazuh agent
-  raw: /var/ossec/bin/agent-auth -m {{ manager.address }} -p {{ manager.registration_port }} -P {{ authd_password }} -I {{ agent.address }} -A test
+  raw: /var/ossec/bin/agent-auth -m {{ manager.address }} -p {{ manager.registration_port }} -P {{ authd_password }} -I {{ agent.address }} -A {{ agent.name }}
   
 #- name: Adding the agent to the manager using the Wazuh API - Wazuh agent  
 #  raw: curl -u {{ api_cred_username }}:{{ api_cred_password}} -k -X POST -d '{"name":"test","ip":"{{ agent.address }}"}' -H 'Content-Type:application/json' "https://{{ manager.address }}:{{ manager.api_port }}/agents?pretty"
