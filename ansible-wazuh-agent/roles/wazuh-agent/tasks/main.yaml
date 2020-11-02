@@ -1,1 +1,54 @@
 ---
+- name: Install necessary packages - Wazuh agent
+  apt:
+    name: "{{ install_packages }}"
+    state: latest
+    
+- name: Add an Apt signing key - Wazuh agent
+  apt_key:
+    url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+    state: present
+    
+- name: Adding apt repository - Wazuh agent
+  apt_repository:
+    repo: deb https://packages.wazuh.com/3.x/apt/ stable main
+    state: present
+    filename: wazuh.list      
+    
+- name: Install agent - Wazuh agent
+  package:
+    name: wazuh-agent={{ wazuh_agent_version }}
+    state: present
+    update_cache: yes
+    
+- name: Creating SSL keys required by ossec-authd - Wazuh agent
+  raw: openssl req -x509 -batch -nodes -days 365 -newkey rsa:2048 -out /var/ossec/etc/sslmanager.cert -keyout /var/ossec/etc/sslmanager.key -batch
+
+- name: Adding the agent to the manager using the registration service - Wazuh agent
+  raw: /var/ossec/bin/agent-auth -m {{ manager.address }} -p {{ manager.registration_port }} -P {{ authd_password }} -I {{ agent.address }} -A test
+  
+#- name: Adding the agent to the manager using the Wazuh API - Wazuh agent  
+#  raw: curl -u {{ api_cred_username }}:{{ api_cred_password}} -k -X POST -d '{"name":"test","ip":"{{ agent.address }}"}' -H 'Content-Type:application/json' "https://{{ manager.address }}:{{ manager.api_port }}/agents?pretty"
+#  register: agent_registration_response
+  
+#- name: Parse agent registration command response - Wazuh agent
+#  ansible.builtin.set_fact:
+#    agent_registration_response_array: "{{ agent_registration_response.stdout | from_json }}"
+#      
+#- name: Debug agent key - Wazuh agent
+#  debug: var=agent_registration_response_array.data.key
+#
+#- name: Copy the key to the agent - Wazuh agent
+#  expect:
+#    command: /var/ossec/bin/manage_agents -i {{ agent_registration_response_array.data.key }}
+#    responses:
+#      (.*)Confirm adding it?(.*):
+#        - y
+  
+- name: Installing agent configuration (ossec.conf) - Wazuh agent
+  template: src=var-ossec-etc-ossec-agent.conf.j2
+            dest=/var/ossec/etc/ossec.conf
+            owner=root
+            group=ossec
+            mode=0644
+  notify: restart wazuh-agent

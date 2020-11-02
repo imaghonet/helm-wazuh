@@ -1,0 +1,25 @@
+---
+install_packages:
+  - curl 
+  - apt-transport-https 
+  - lsb-release
+  
+wazuh_agent_version: 3.13.2-1
+
+manager:
+  address: 172.19.0.3
+  api_port: 31299
+  registration_port: 31125
+  
+worker:
+  address: 172.19.0.3
+  agents_events_port: 31660
+  protocol: tcp  
+  
+agent:
+  address: 172.19.0.3
+  
+authd_password: password
+  
+api_cred_username: Zm9v # string "foo" base64 encoded
+api_cred_password: YmFy # string "bar" base64 encoded  
