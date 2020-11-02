@@ -43,7 +43,7 @@ wazuh-elasticsearch:
         mountPath: /usr/share/elasticsearch/data
         reclaimPolicy: Retain
         capacity: 10Gi
-        storageClassName: microk8s-hostpath
+        storageClassName: standard
         accessModes:
           - ReadWriteOnce 
           
@@ -118,7 +118,7 @@ wazuh-elasticsearch:
         mountPath: /usr/share/elasticsearch/data
         reclaimPolicy: Retain
         capacity: 30Gi
-        storageClassName: microk8s-hostpath
+        storageClassName: standard
         accessModes:
           - ReadWriteOnce
           
@@ -188,7 +188,7 @@ wazuh-managers:
           mountPath: /var/ossec/data
           reclaimPolicy: Retain
           capacity: 50Gi
-          storageClassName: microk8s-hostpath
+          storageClassName: standard
           accessModes:
             - ReadWriteOnce 
             
@@ -223,7 +223,7 @@ wazuh-managers:
           mountPath: /var/ossec/data
           reclaimPolicy: Retain
           capacity: 10Gi
-          storageClassName: microk8s-hostpath
+          storageClassName: standard
           accessModes:
             - ReadWriteOnce
             
