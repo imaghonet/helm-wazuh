@@ -326,3 +326,7 @@ wazuh-kibana:
 #      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https  
     type: ClusterIP
 #    type: LoadBalancer  
+
+agent:
+  address: 172.19.0.3
+  subnet: 172.19.0.0/24
